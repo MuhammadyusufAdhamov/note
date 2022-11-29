@@ -20,13 +20,13 @@ type GetAllNotesParams struct {
 
 type GetAllNotesResults struct {
 	Notes []*Note
-	count int32
+	Count int32
 }
 
 type NoteStorageI interface {
-	Create(note *Note) (*Note, error)
-	// Get(id int64) (*User, error)
-	// GetAll(params *GetAllNotesParams) (*GetAllNotesResults, error)
-	// Update(notes *Note) error
-	// Delete(id int64) error
+	CreateNote(note *Note) (*Note, error)
+	GetNote(id int64) (*Note, error)
+	GetAllNotes(params *GetAllNotesParams) (*GetAllNotesResults, error)
+	UpdateNote(note *Note) (*Note, error)
+	DeleteNote(note *Note) (*Note, error)
 }
