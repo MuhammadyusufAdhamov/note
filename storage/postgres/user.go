@@ -20,12 +20,12 @@ func NewUser(db *sqlx.DB) repo.UserStorageI {
 
 func (ur *userRepo) CreateUser(user *repo.User) (*repo.User, error) {
 	query := `
-		insert into user(
+		insert into users (
 			first_name,
 			last_name,
 			phone_number,
 			email,
-			image_url,
+			image_url
 		) values ($1,$2,$3,$4,$5)
 		returning id,created_at
 	`
@@ -63,7 +63,7 @@ func (ur *userRepo) GetUser(id int64) (*repo.User, error) {
 			email,
 			image_url,
 			created_at
-		from user where id=$1
+		from users where id=$1
 	`
 
 	row := ur.db.QueryRow(query, id)
@@ -96,8 +96,8 @@ func (ur *userRepo) GetAllUsers(params *repo.GetAllUsersParams) (*repo.GetAllUse
 	if params.Search != "" {
 		str := "%" + params.Search + "%"
 		filter += fmt.Sprintf(
-			` where title ilike '%s' or description '%s'`,
-			str, str,
+			` where first_name ilike '%s' or last_name ilike '%s' or email ilike '%s' `,
+			str, str,str,
 		)
 	}
 
@@ -110,8 +110,8 @@ func (ur *userRepo) GetAllUsers(params *repo.GetAllUsersParams) (*repo.GetAllUse
 			email,
 			image_url,
 			created_at
-		from user
-	` + filter + `
+		from users
+	` + filter + ` 	
 	order by created_at desc
 	` + limit
 
@@ -141,7 +141,7 @@ func (ur *userRepo) GetAllUsers(params *repo.GetAllUsersParams) (*repo.GetAllUse
 		result.Users = append(result.Users, &u)
 	}
 
-	queryCount := `select count(1) from user ` + filter
+	queryCount := `select count(1) from users ` + filter
 	err = ur.db.QueryRow(queryCount).Scan(&result.Count)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (ur *userRepo) UpdateUser(user *repo.User) (*repo.User, error) {
 	UpdatedAt := time.Now()
 
 	query := `
-		update user set
+		update users set
 			first_name=$1,
 			last_name=$2,
 			phone_number=$3,
@@ -186,7 +186,7 @@ func (ur *userRepo) UpdateUser(user *repo.User) (*repo.User, error) {
 		&result.Email,
 		&result.ImageUrl,
 		&result.CreatedAt,
-		UpdatedAt,
+		&UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -199,7 +199,7 @@ func (ur *userRepo) DeleteUser(user *repo.User) (*repo.User, error) {
 	var result repo.User
 	DeletedAt := time.Now()
 
-	query := `update user set
+	query := `update users set
 				deleted_at=$1
 			where id=$2
 			returning id, deleted_at`

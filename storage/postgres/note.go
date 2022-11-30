@@ -20,7 +20,7 @@ func NewNote(db *sqlx.DB) repo.NoteStorageI {
 
 func (ur *noteRepo) CreateNote(note *repo.Note) (*repo.Note, error) {
 	query := `
-		insert into note(
+		insert into notes(
 			user_id,
 			title,
 			description
@@ -56,7 +56,7 @@ func (ur *noteRepo) GetNote(id int64) (*repo.Note, error) {
 			title,
 			description,
 			created_at
-		from note where id=$1
+		from notes where id=$1
 	`
 
 	row := ur.db.QueryRow(query, id)
@@ -99,7 +99,7 @@ func (ur *noteRepo) GetAllNotes(params *repo.GetAllNotesParams) (*repo.GetAllNot
 			title,
 			description,
 			created_at
-		from note
+		from notes
 	` + filter + `
 	order by created_at desc
 	` + limit
@@ -128,7 +128,7 @@ func (ur *noteRepo) GetAllNotes(params *repo.GetAllNotesParams) (*repo.GetAllNot
 		result.Notes = append(result.Notes, &n)
 	}
 
-	queryCount := `select count(1) from note ` + filter
+	queryCount := `select count(1) from notes ` + filter
 	err = ur.db.QueryRow(queryCount).Scan(&result.Count)
 	if err != nil {
 		return nil, err
@@ -142,7 +142,7 @@ func (ur *noteRepo) UpdateNote(note *repo.Note) (*repo.Note, error) {
 	UpdatedAt := time.Now()
 
 	query := `
-		update note set
+		update notes set
 			user_id=$1,
 			title=$2,
 			description=$3
@@ -179,7 +179,7 @@ func (ur *noteRepo) DeleteNote(note *repo.Note) (*repo.Note, error) {
 	var result repo.Note
 	DeletedAt := time.Now()
 
-	query := `update note set
+	query := `update notes set
 				deleted_at=$1
 			where id=$2
 			returning id, deleted_at`

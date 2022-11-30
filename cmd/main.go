@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/MuhammadyusufAdhamov/note/api"
 	"github.com/MuhammadyusufAdhamov/note/config"
+	"github.com/MuhammadyusufAdhamov/note/storage"
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/lib/pq"
@@ -22,9 +24,21 @@ func main() {
 		cfg.Postgres.Database,
 	)
 
-	_, err := sqlx.Connect("postgres", psqlUrl)
+	psqlConn, err := sqlx.Connect("postgres", psqlUrl)
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
+
+	strg := storage.NewStoragePg(psqlConn)
+
+	apiServer := api.New(&api.RouterOptions{
+		Cfg: &cfg,
+		Storage: strg,
+	})
+	err = apiServer.Run(cfg.HttpPort)
+	if err != nil {
+		log.Fatalf("failed to tun server error %v", err)
+	}
+	
 	log.Print("Server stopped")
 }
