@@ -36,13 +36,14 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+
 	user, err := strg.User().UpdateUser(&repo.User{
 		FirstName: faker.FirstName(),
 		LastName: faker.LastName(),
 		PhoneNumber: faker.Phonenumber(),
 		Email: faker.Email(),
 		ImageUrl: faker.URL(),
-		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, user)

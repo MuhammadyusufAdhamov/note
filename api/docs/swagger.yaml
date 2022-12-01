@@ -70,6 +70,11 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.ResponseOK:
+    properties:
+      message:
+        type: string
+    type: object
   models.User:
     properties:
       created_at:
@@ -98,6 +103,31 @@ info:
   title: Swagger for blog api
   version: "1.0"
 paths:
+  /file-upload:
+    post:
+      consumes:
+      - application/json
+      description: File upload
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ResponseOK'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: File upload
+      tags:
+      - file-upload
   /note:
     post:
       consumes:
